@@ -380,6 +380,27 @@ if('serviceWorker' in navigator){
     .then(()=>console.log('Service Worker registrado!'))
     .catch(err=>console.log('Erro SW:',err));
 }
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBbgbO2Mwqbmg8Hq7Kc_Mk1ywAeHeqUkw",
+    authDomain: "rnp1-9ba04.firebaseapp.com",
+    projectId: "rnp1-9ba04",
+    storageBucket: "rnp1-9ba04.firebasestorage.app",
+    messagingSenderId: "872258932358",
+    appId: "1:872258932358:web:a7a91d77bb6f80123b4b07"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+
 </script>
 
 
