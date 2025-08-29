@@ -324,7 +324,12 @@ function verificarPlaca() {
   const placa = placaInput.value.toUpperCase();
   placaInput.value = placa;
 
-  if (placa.length !== 7) { alert("A placa deve ter exatamente 7 caracteres!"); placaInput.value = ""; placaInput.focus(); return; }
+  if (placa.length !== 7) { 
+    alert("A placa deve ter exatamente 7 caracteres!"); 
+    placaInput.value = ""; 
+    placaInput.focus(); 
+    return; 
+  }
 
   const autorizado = bancoAutorizados.find(i => i.placa === placa);
   if (autorizado) {
@@ -349,7 +354,13 @@ function verificarPlaca() {
         <p><b>Nome:</b> ${registro.nome}</p>
         <p><b>RG/CPF:</b> ${registro.rgcpf}</p>
         <p><b>Status:</b><span style="color:${cor}">${statusAtual}</span></p>
-        <button class="entrada" onclick="marcarEntrada('${placa}')">Entrada</button>
+        <label>Tipo:</label>
+        <select id="tipoEntrada">
+          <option value="Despacho" ${registro.tipo === "Despacho" ? "selected" : ""}>Despacho</option>
+          <option value="Retiro" ${registro.tipo === "Retiro" ? "selected" : ""}>Retiro</option>
+        </select>
+        <br><br>
+        <button class="entrada" onclick="marcarEntradaComTipo('${placa}')">Entrada</button>
         <button class="saida" onclick="marcarSaida('${placa}')">Saída</button>
       `);
     } else {
@@ -370,6 +381,33 @@ function verificarPlaca() {
   placaInput.value = "";
   placaInput.focus();
 }
+
+// Nova função para registrar entrada com tipo selecionado
+function marcarEntradaComTipo(placa) {
+  const tipoSelecionado = document.getElementById("tipoEntrada").value;
+  const existe = [...bancoHistorico].reverse().find(h => h.placa === placa && h.status === "Em andamento");
+  if (existe) { alert("Essa placa já está em andamento!"); return; }
+
+  const cadastro = bancoCadastros.find(i => i.placa === placa) || bancoAutorizados.find(i => i.placa === placa);
+  if (!cadastro) return;
+
+  const hoje = formatarData(new Date());
+  bancoHistorico.push({
+    nome: cadastro.nome,
+    placa: cadastro.placa,
+    rgcpf: cadastro.rgcpf,
+    tipo: tipoSelecionado,
+    status: "Em andamento",
+    data: hoje,
+    horarioEntrada: new Date().toLocaleTimeString(),
+    horarioSaida: ""
+  });
+
+  salvarBanco();
+  fecharPopup();
+  alert("Entrada registrada com sucesso! ✅");
+}
+
 
 function entradaNovaPlaca(placa) {
   const nome = document.getElementById("nomeInput").value;
@@ -478,8 +516,86 @@ function checarExportacaoAutomaticaPDF() {
   console.log("Exportação automática em PDF realizada!");
 }
 
+// ===== EXPORTAÇÃO LOCALSTORAGE =====
+function exportLocalStorage() {
+    return JSON.stringify({
+        bancoCadastros,
+        bancoHistorico,
+        bancoAutorizados
+    });
+}
+
+function downloadLS(filename = "backup_localstorage.json") {
+    const blob = new Blob([exportLocalStorage()], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ===== BOTÃO EXPORTAR =====
+function criarBotaoExportLS() {
+    const btn = document.createElement("button");
+    btn.textContent = "Exportar LS";
+    btn.style = "padding:5px 10px; margin:5px; cursor:pointer; background:#2196F3; color:white; border:none; border-radius:5px;";
+    btn.addEventListener("click", () => {
+        downloadLS();
+        localStorage.setItem("lastLSBackup", Date.now().toString());
+        alert("Backup exportado!");
+    });
+    document.getElementById("historicoContainer").insertBefore(btn, null);
+}
+criarBotaoExportLS();
+
+// ===== BOTÃO IMPORTAR =====
+const importInput = document.createElement("input");
+importInput.type = "file";
+importInput.accept = ".json";
+importInput.style.display = "none";
+document.body.appendChild(importInput);
+
+const importBtn = document.createElement("button");
+importBtn.textContent = "Importar LS";
+importBtn.style = "padding:5px 10px; margin:5px; cursor:pointer;";
+document.getElementById("historicoContainer").appendChild(importBtn);
+
+importBtn.addEventListener("click", () => importInput.click());
+
+importInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const dados = JSON.parse(e.target.result);
+            const chaves = ["bancoCadastros","bancoHistorico","bancoAutorizados"];
+            if (!chaves.every(k => dados.hasOwnProperty(k))) {
+                alert("Arquivo inválido!");
+                return;
+            }
+
+            // Atualiza localStorage e arrays
+            chaves.forEach(k => localStorage.setItem(k, JSON.stringify(dados[k])));
+            bancoCadastros = dados.bancoCadastros;
+            bancoHistorico = dados.bancoHistorico;
+            bancoAutorizados = dados.bancoAutorizados;
+
+            salvarBanco(); // atualiza tela
+            alert("Backup importado com sucesso!");
+            importInput.value = ""; // permite reimportar mesmo arquivo
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao importar arquivo!");
+        }
+    };
+    reader.readAsText(file);
+});
+
+
 // ===== Inicialização =====
 mostrarPagina('inicioContainer');
 salvarBanco();
 window.addEventListener("load", checarExportacaoAutomaticaPDF);
-
