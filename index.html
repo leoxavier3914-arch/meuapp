@@ -8,15 +8,16 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
-   <!--
+  <!-- EmailJS -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script> (function(){ emailjs.init("vPVpXFO3k8QblVbqr"); })(); </script>
-   -->
+<script type="text/javascript">
+  (function() {
+    emailjs.init("vPVpXFO3k8QblVbqr"); //  public key
+  })();
+</script>
+
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- SMTP.js -->
-  <script src="https://smtpjs.com/v3/smtp.js"></script>
 </head>
 <body>
 
@@ -40,6 +41,7 @@
 <div id="inicioContainer">
   <h1>Controle de Placas</h1>
   <p>Digite a placa para verificar:</p>
+  <!-- LIMITE DE 7 CARACTERES E MAIÚSCULO -->
   <input type="text" id="placaInput" placeholder="Ex: ABC1234" maxlength="7" oninput="this.value = this.value.toUpperCase()">
   <button onclick="verificarPlaca()">Verificar</button>
   <div id="mensagem"></div>
@@ -51,36 +53,35 @@
 </div>
 
 <!-- CADASTROS -->
-<div id="cadastroContainer" style="display:none">
+<div id="cadastroContainer">
   <h2>Cadastros</h2>
   <div id="listaCadastros" class="lista"></div>
 </div>
 
 <!-- AUTORIZADOS -->
-<div id="autorizadosContainer" style="display:none">
+<div id="autorizadosContainer">
   <h2>Autorizados</h2>
-  
-  <input type="text" id="pesquisaAut" placeholder="Pesquisar" oninput="filtrarAutorizados()">
+  <input type="text" id="pesquisaAut" placeholder="Pesquisar autorizado..." style="margin-bottom:10px; padding:5px; width:100%;">
+<div id="listaAutorizados"></div>
   <div id="listaAutorizados" class="lista"></div>
-  
   <input type="text" id="nomeAutInput" placeholder="Nome">
   <input type="text" id="placaAutInput" placeholder="Placa" maxlength="7" oninput="this.value=this.value.toUpperCase()">
   <input type="text" id="rgcpfAutInput" placeholder="RG/CPF">
   <button onclick="adicionarAutorizado()">Adicionar</button>
-  <button class="botaoExcluir" onclick="iniciarExclusaoAut()">Excluir</button>
+ <button class="botaoExcluir" onclick="iniciarExclusaoAut()">Excluir</button>
   <button class="botaoEditar" onclick="iniciarEdicaoAut()">Editar</button>
-  </div>
+</div>
 
 <!-- HISTÓRICO -->
-<div id="historicoContainer" style="display:none">
+<div id="historicoContainer">
   <h2>Histórico</h2>
   <label for="dataFiltro">Selecionar data:</label>
   <input type="date" id="dataFiltro">
   <button onclick="filtrarHistorico()">Buscar</button>
+  <div id="listaHistorico" class="lista"></div>
   <button id="exportBtn" onclick="exportarCSV()">Exportar CSV</button>
   <button onclick="exportarPDF()">Exportar PDF</button>
-  <button onclick="enviarEmail()">Enviar por e-mail</button>
-  <div id="listaHistorico" class="lista"></div>
+  <button onclick="enviarPDFManual()">Enviar por e-mail</button>
 </div>
 
 <!-- script principal -->
