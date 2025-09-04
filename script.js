@@ -277,13 +277,14 @@ function exportarCSV() {
 
 // ===== Exportação PDF =====
 function exportarPDF(dataDesejada = null) {
-  if (!window.jspdf || !window.jspdf.jsPDF) {
+  if (!window.jsPDF) {
     alert("Erro: jsPDF não carregado!");
     return null;
   }
-  const doc = new window.jspdf.jsPDF();
 
+  const doc = new jsPDF();
   const dataFiltro = dataDesejada || formatarData(new Date());
+
   const filtered = bancoHistorico.filter(item => item.data === dataFiltro);
 
   if (filtered.length === 0) {
@@ -296,38 +297,44 @@ function exportarPDF(dataDesejada = null) {
 
   let y = 25;
   doc.setFontSize(12);
+
   filtered.forEach(item => {
-    doc.text(`Placa: ${item.placa} | Nome: ${item.nome} | Tipo: ${item.tipo} | RG/CPF: ${item.rgcpf} | Status: ${item.status} | Entrada: ${item.horarioEntrada || "-"} | Saída: ${item.horarioSaida || "-"}`, 10, y);
+    doc.text(
+      `Placa: ${item.placa} | Nome: ${item.nome} | Tipo: ${item.tipo} | RG/CPF: ${item.rgcpf} | Status: ${item.status} | Entrada: ${item.horarioEntrada || "-"} | Saída: ${item.horarioSaida || "-"}`,
+      10,
+      y
+    );
     y += 8;
-    if (y > 280) { doc.addPage(); y = 20; }
+    if (y > 280) { 
+      doc.addPage(); 
+      y = 20; 
+    }
   });
 
-  return doc.output("blob");
+  return doc.output("blob"); // retorna Blob do PDF
 }
 
+// Função para abrir ou baixar PDF localmente
 function enviarPDFManual() {
   const pdfBlob = exportarPDF();
   if (!pdfBlob) return;
 
   const reader = new FileReader();
   reader.onload = function() {
-    const pdfBase64 = reader.result.split(',')[1]; // pega só o Base64
+    const pdfBase64 = reader.result.split(',')[1]; // pega Base64
 
     emailjs.send("service_t9bocqh", "template_n4uw7xi", {
       to_email: "histplacas@gmail.com",
       title: "Histórico Diário (PDF Manual)",
       name: "Sistema de Placas",
       message: "Segue o histórico em PDF.",
- attachment: `data:application/pdf;base64,${pdfBase64}`
-
+      attachment: `data:application/pdf;base64,${pdfBase64}` // ou "attachments" se seu template exigir
     })
     .then(() => alert("📧 PDF enviado manualmente com sucesso!"))
-    .catch(err => alert("❌ Erro ao enviar: " + JSON.stringify(err)));
-
+    .catch(err => alert("❌ Erro ao enviar PDF: " + JSON.stringify(err)));
   };
   reader.readAsDataURL(pdfBlob);
 }
-
 
 
 // ===== Entrada/Saída de placas =====
