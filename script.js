@@ -277,8 +277,11 @@ function exportarCSV() {
 
 // ===== Exportação PDF =====
 function exportarPDF(dataDesejada = null) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("Erro: jsPDF não carregado!");
+    return null;
+  }
+  const doc = new window.jspdf.jsPDF();
 
   const dataFiltro = dataDesejada || formatarData(new Date());
   const filtered = bancoHistorico.filter(item => item.data === dataFiltro);
@@ -299,8 +302,7 @@ function exportarPDF(dataDesejada = null) {
     if (y > 280) { doc.addPage(); y = 20; }
   });
 
-  const pdfBlob = doc.output("blob");
-  return pdfBlob;
+  return doc.output("blob");
 }
 
 function enviarPDFManual() {
