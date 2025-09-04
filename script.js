@@ -303,7 +303,6 @@ function exportarPDF(dataDesejada = null) {
   return pdfBlob;
 }
 
-
 function enviarPDFManual() {
   const pdfBlob = exportarPDF();
   if (!pdfBlob) return;
