@@ -1,4 +1,5 @@
 // ===== Banco de dados local =====
+let autorizadoSelecionado = null;
 let bancoCadastros = JSON.parse(localStorage.getItem("bancoCadastros")) || [];
 let bancoHistorico = JSON.parse(localStorage.getItem("bancoHistorico")) || [];
 let bancoAutorizados = JSON.parse(localStorage.getItem("bancoAutorizados")) || [];
@@ -98,8 +99,14 @@ function adicionarAutorizado() {
   const placa = document.getElementById("placaAutInput").value;
   const rgcpf = document.getElementById("rgcpfAutInput").value;
   if (!nome || !placa || !rgcpf) { alert("Preencha todos os campos!"); return; }
+
   bancoAutorizados.push({ nome, placa, rgcpf });
+
+  // Atualiza apenas a lista de autorizados sem filtro
+  atualizarAutorizados("");
+
   salvarBanco();
+
   document.getElementById("nomeAutInput").value = "";
   document.getElementById("placaAutInput").value = "";
   document.getElementById("rgcpfAutInput").value = "";
@@ -107,17 +114,26 @@ function adicionarAutorizado() {
 }
 
 
-function atualizarAutorizados() {
+function atualizarAutorizados(filtro = "") {
   const listaDiv = document.getElementById("listaAutorizados");
   listaDiv.innerHTML = "";
 
+  filtro = filtro.toLowerCase();
+
   bancoAutorizados.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `<b>${item.placa}</b> - ${item.nome} - RG/CPF: ${item.rgcpf}`;
-    div.onclick = () => selecionarAutorizado(index);
-    listaDiv.appendChild(div);
+    const texto = `${item.nome} ${item.placa} ${item.rgcpf}`.toLowerCase();
+    if (!filtro || texto.includes(filtro)) {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `<b>${item.placa}</b> - ${item.nome} - RG/CPF: ${item.rgcpf}`;
+      div.onclick = () => selecionarAutorizado(index);
+
+      if (index === autorizadoSelecionado) div.classList.add("selecionado");
+
+      listaDiv.appendChild(div);
+    }
   });
+
 }
 
 function selecionarAutorizado(index) {
@@ -630,6 +646,11 @@ function enviarPDFDiaAnteriorSeNecessario() {
   };
 
   reader.readAsDataURL(pdfBlob);
+}
+
+function filtrarAutorizados() {
+  const filtro = document.getElementById("pesquisaAut").value;
+  atualizarAutorizados(filtro);
 }
 
 // ===== Dispara apenas ao abrir o app =====
