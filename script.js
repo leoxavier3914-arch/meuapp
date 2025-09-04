@@ -632,9 +632,10 @@ function enviarPDFDiaAnteriorSeNecessario() {
     const pdfBase64 = reader.result.split(',')[1];
 
     emailjs.send("service_t9bocqh", "template_n4uw7xi", {
-      to_email: "leomatos3914@gmail.com",
+      to_email: "histplacas@gmail.com",
       title: `Histórico Diário - ${dataOntem}`,
       name: "Sistema de Placas",
+      message: "Segue o histórico em PDF.",
       attachment: `data:application/pdf;base64,${pdfBase64}`
     })
     .then(() => {
