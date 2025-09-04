@@ -8,14 +8,14 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- REMOVIDO: EmailJS (era pago para anexo) -->
-  <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script> (function(){ emailjs.init("vPVpXFO3k8QblVbqr"); })(); </script> -->
+  
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script> (function(){ emailjs.init("vPVpXFO3k8QblVbqr"); })(); </script>
 
-  <!-- jsPDF (para gerar o PDF em memória/base64) -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- SMTP.js (para enviar via Outlook com anexo em PDF) -->
+  <!-- SMTP.js -->
   <script src="https://smtpjs.com/v3/smtp.js"></script>
 </head>
 <body>
@@ -59,15 +59,17 @@
 <!-- AUTORIZADOS -->
 <div id="autorizadosContainer" style="display:none">
   <h2>Autorizados</h2>
+  
+  <input type="text" id="pesquisaAut" placeholder="Pesquisar" oninput="filtrarAutorizados()">
+  <div id="listaAutorizados" class="lista"></div>
+  
   <input type="text" id="nomeAutInput" placeholder="Nome">
   <input type="text" id="placaAutInput" placeholder="Placa" maxlength="7" oninput="this.value=this.value.toUpperCase()">
   <input type="text" id="rgcpfAutInput" placeholder="RG/CPF">
   <button onclick="adicionarAutorizado()">Adicionar</button>
   <button class="botaoExcluir" onclick="iniciarExclusaoAut()">Excluir</button>
   <button class="botaoEditar" onclick="iniciarEdicaoAut()">Editar</button>
-    <input type="text" id="pesquisaAut" placeholder="Pesquisar" oninput="filtrarAutorizados()">
-  <div id="listaAutorizados" class="lista"></div>
-</div>
+  </div>
 
 <!-- HISTÓRICO -->
 <div id="historicoContainer" style="display:none">
